@@ -10,14 +10,21 @@
 ## so the computation need not be done again
 
 makeCacheMatrix <- function(x = matrix()) {
+    # private var to be maintained via closure
     inv <- NULL
+    # setter assigns incoming matrix to enclosed
+    # and sets inversion back to null
     set <- function(y) {
         x <<- y
         inv <<- NULL
     }
+    # returns enclosed matrix
     get <- function() x
+    #assigns inversion to enclosed inversion
     setinversion <- function(inversion) inv <<- inversion
+    #returns enclosed inversion
     getinversion <- function() inv
+    # returns list to be used as cached matrix object
     list(set = set, get = get,
          setinversion = setinversion, getinversion = getinversion)
 }
@@ -31,13 +38,24 @@ makeCacheMatrix <- function(x = matrix()) {
 
 cacheSolve <- function(x, ...) {
     ## Return a matrix that is the inverse of 'x'
+    # get the current value of enclosed inversion
     inv <- x$getinversion()
+    # if it is not null, 
+    # then calc has been done previously
+    # return cached inversion
     if(!is.null(inv)) {
         message("getting cached data")
         return(inv)
     }
+    # if inversion was null, then we make it to this
+    # portion of code
+    # and need to calculate and cache the inversion
+    # get the matrix
     data <- x$get()
+    # calculate the inversion
     inv <- solve(data, ...)
+    # cache the inversion
     x$setinversion(inv)
+    # return the inversion
     inv
 }
